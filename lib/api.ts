@@ -1,11 +1,11 @@
-import "server-only";
 import { Movie, PaginatedResponse } from "@/types/types";
 
-const token = process.env.TMDB_ACCESS_TOKEN;
+const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 
-if (!token) {
-  throw new Error("No TMDB Access Token set in .env.local");
+if (!apiKey) {
+  throw new Error("No TMDB API Key set in .env.local");
 }
+
 
 const BASE_URL = "https://api.themoviedb.org/3"; // should be https, not http
 
@@ -14,7 +14,7 @@ async function tmdbFetch<T>(path: string, search = ""): Promise<T> {
 
   const res = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${apiKey}`,
       Accept: "application/json",
     },
     next: { revalidate: 3600 }, // ISR for Next.js

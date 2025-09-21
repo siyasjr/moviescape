@@ -2,22 +2,21 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { getPopularMovies, posterUrl } from '@/lib/api'
+import { Movie } from '@/types/types'
 
 export default function Home() {
-  const [movies, setMovies] = useState<any[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [movies, setMovies] = useState<Movie[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-        )
-        const data = await res.json()
-        setMovies(data.results || []) // Ensure it's always an array
+        const results = await getPopularMovies()
+        setMovies(results)
       } catch (err) {
         console.error('Failed to fetch movies', err)
-        setMovies([]) // fallback to empty array
+        setMovies([])
       } finally {
         setLoading(false)
       }
@@ -35,9 +34,9 @@ export default function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {movies.map((movie) => (
           <div key={movie.id} className="border p-4 rounded-lg shadow-md">
-            {movie.poster_path ? (
+            {posterUrl(movie.poster_path) ? (
               <Image
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                src={posterUrl(movie.poster_path)!}
                 alt={movie.title}
                 width={500}
                 height={750}
