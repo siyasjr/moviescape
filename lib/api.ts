@@ -2,51 +2,47 @@ import "server-only";
 import { Movie, PaginatedResponse } from "@/types/types";
 
 const token = process.env.TMDB_ACCESS_TOKEN;
-if(!token) {
-  throw new Error('No Access Token set');
+
+if (!token) {
+  throw new Error("No TMDB Access Token set in .env.local");
 }
 
-const BASE_URL = "http://api.themoviedb.org/3";
+const BASE_URL = "https://api.themoviedb.org/3"; // should be https, not http
 
-async function tmbdFetch<T>(path: string, search = ""): Promise<T>{
-
+async function tmdbFetch<T>(path: string, search = ""): Promise<T> {
   const url = `${BASE_URL}${path}${search ? `?${search}` : ""}`;
 
   const res = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${process.env.TMDB_ACCESS_TOKEN!}`,
+      Authorization: `Bearer ${token}`,
       Accept: "application/json",
     },
+    next: { revalidate: 3600 }, // ISR for Next.js
+  });
 
-    next: { revalidate: 3600},
-
-  })
-
-  if (!res.ok){
+  if (!res.ok) {
     throw new Error(`TMDB error ${res.status} : ${await res.text()}`);
   }
 
   return res.json();
-
 }
 
-export async function getPopularMovies(page = 1){
+// Get only the `results` array so page.tsx can map directly
+export async function getPopularMovies(page = 1): Promise<Movie[]> {
+  const qs = new URLSearchParams({
+    language: "en-US",
+    page: String(page),
+  }).toString();
 
-    const qs = new URLSearchParams({
-      language: "en-US",
-      page: String(page), 
+  const data = await tmdbFetch<PaginatedResponse<Movie>>("/movie/popular", qs);
 
-    }).toString();
-
-    return tmbdFetch<PaginatedResponse<Movie>>("/movie/popular", qs);
-
+  return data.results; // 👈 now page.tsx can do movies.map()
 }
 
+// Build poster URL safely
 export function posterUrl(
-  path: string | null ,
-  size: "w342" | "w500" | "original" = "w500",
-
- ){
-  return path ? `https://image.tmdb.org/t/p/${size}${path}` : null;
- }
- 
+  path: string | null,
+  size: "w342" | "w500" | "original" = "w500"
+): string {
+  return path ? `https://image.tmdb.org/t/p/${size}${path}` : "/placeholder.png";
+}
