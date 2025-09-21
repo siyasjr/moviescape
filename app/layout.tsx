@@ -4,7 +4,7 @@ import { FavoritesProvider } from "@/components/favorites-context";
 import NavBar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "MovieBox",
+  title: "moviescape",
   description: "Popular movies + your favorites",
 };
 
