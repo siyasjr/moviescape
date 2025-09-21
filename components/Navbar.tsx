@@ -11,7 +11,7 @@ export default function NavBar() {
       <nav className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
         <Link href="/" className="flex items-center gap-2 font-semibold">
             <Film className="h-5 w-5" />
-            <span>MovieBox</span>
+            <span>moviescape</span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
           <Button asChild variant="ghost">
