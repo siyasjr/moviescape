@@ -55,3 +55,6 @@ export default function Home() {
     </div>
   )
 }
+
+
+console.log("TMDB API Key:", process.env.NEXT_PUBLIC_TMDB_API_KEY)
