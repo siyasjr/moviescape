@@ -13,9 +13,21 @@ export function useFavorites() {
     }
   }, []);
 
-  
+  const toggleFavorite = (movie: Movie) => {
+    const exists = favorites.find((m) => m.id === movie.id);
+    let updated: Movie[];
+
+    if (exists) {
+      updated = favorites.filter((m) => m.id !== movie.id);
+    } else {
+      updated = [...favorites, movie];
+    }
+
+    setFavorites(updated);
+    localStorage.setItem("favorites", JSON.stringify(updated));
+  };
 
   const isFavorite = (id: number) => favorites.some((m) => m.id === id);
 
-  return { favorites, isFavorite };
+  return { favorites, toggleFavorite, isFavorite };
 }
